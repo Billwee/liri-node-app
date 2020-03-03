@@ -7,6 +7,10 @@ var fs = require('fs');
 var keys = require('./keys.js');
 var spotify = new Spotify(keys.spotify);
 
+// The three functions all have the same basic functionallity.
+// I'll go over the first one with comments and all three should
+// be more understandable afterwards.
+
 //BANDSINTOWN FUNCTION
 var concertThis = function(input) {
   var queryURL =
@@ -22,7 +26,9 @@ var concertThis = function(input) {
       // artist or not. No shows returns an empty array and we check for
       // that
       if (response.data && response.data.length) {
-        // Has concert dates
+        // This part is the conditional is called if the array contains data.
+
+        // Appends an opening line of whats being called/logged
         fs.appendFile(
           'log.txt',
           `UPCOMING SHOWS FOR ${input.toUpperCase()}\n`,
@@ -32,6 +38,7 @@ var concertThis = function(input) {
             }
           }
         );
+        // a forEach loop putting the content of each show into an object
         response.data.forEach(item => {
           var obj = {
             Venue: item.venue.name,
@@ -39,6 +46,7 @@ var concertThis = function(input) {
             Date: moment(item.datetime).format('MM/DD/YYYY')
           };
           concertArr.push(obj);
+          // Appending the info the the log.txt file
           fs.appendFile(
             'log.txt',
             `----------\nVenue: ${item.venue.name} \nLocation: ${
@@ -52,15 +60,16 @@ var concertThis = function(input) {
               }
             }
           );
-        }); //End of forEach
+        }); // Logging the array of objects
         console.log(concertArr);
+        // Added the empty lines to the end of the log for readability
         fs.appendFile('log.txt', `\n \n \n`, function(err) {
           if (err) {
             console.log(err);
           }
         });
       } else {
-        // No concerts scheduled
+        // If the array is empty there are no concerts scheduled
         console.log('No concert dates right now');
       }
     })
@@ -153,7 +162,6 @@ var spotifyThisSong = function(input) {
 };
 
 //OMDB FUNCTION
-
 var movieThis = function(input) {
   var queryURL =
     'http://www.omdbapi.com/?t=' + input + '&y=&plot=short&apikey=trilogy';
@@ -276,6 +284,9 @@ var movieThis = function(input) {
 
 //BANDSINTOWN CALL
 if (process.argv[2] === 'concert-this') {
+  // The first three functions have a var and loop for capturing
+  // the users input into one string. Followed by a function call
+  // with that string.
   let artist = '';
   for (let i = 3; i < process.argv.length; i++) {
     artist += process.argv[i] + ' ';
@@ -307,11 +318,13 @@ else if (process.argv[2] === 'movie-this') {
   movieThis(movie);
 } //FS CALL
 else if (process.argv[2] === 'do-what-it-says') {
+  // This part of the conditional reads the random.txt file,
+  // sperates the values by commas into an array, and uses the
+  // data to call the corresponding function.
   fs.readFile('random.txt', 'utf8', function(err, data) {
     if (err) {
       return console.log(err);
     }
-    // Then split it by commas (to make it more readable)
     var dataArr = data.split(',');
 
     if (dataArr[0] === 'concert-this') {
@@ -324,7 +337,9 @@ else if (process.argv[2] === 'do-what-it-says') {
       console.log('Invalid txt file parameters.');
     }
   });
-} //ERROR MSG
+} // This message is displayed if the user makes an improper call
+// then the message displayed informs the user how to make the
+// correct calls for the app.
 else {
   console.log(
     "**IMPROPER CALL** \n------------\nUse the following format \n------------ \nnode liri.js concert-this <artist/band name here> - FOR CONCERT DATES \nnode liri.js spotify-this-song '<song name here>' - FOR SONG SEARCH \nnode liri.js movie-this '<movie name here>' - FOR MOVIE INFO \nnode liri.js do-what-it-says - FOR TEXT FILE INPUT"
