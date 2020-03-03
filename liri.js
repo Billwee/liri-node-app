@@ -6,3 +6,66 @@ var fs = require('fs');
 
 var keys = require('./keys.js');
 var spotify = new Spotify(keys.spotify);
+
+//BANDSINTOWN FUNCTION
+var concertThis = function(input) {
+  var queryURL =
+    'https://rest.bandsintown.com/artists/' +
+    input +
+    '/events?app_id=codingbootcamp';
+
+  axios
+    .get(queryURL)
+    .then(function(response) {
+      concertArr = [];
+      // This conditional checks if there are any concert dates for the
+      // artist or not. No shows returns an empty array and we check for
+      // that
+      if (response.data && response.data.length) {
+        // Has concert dates
+        fs.appendFile(
+          'log.txt',
+          `UPCOMING SHOWS FOR ${input.toUpperCase()}\n`,
+          function(err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        response.data.forEach(item => {
+          var obj = {
+            Venue: item.venue.name,
+            Location: item.venue.city + ',' + item.venue.region,
+            Date: moment(item.datetime).format('MM/DD/YYYY')
+          };
+          concertArr.push(obj);
+          fs.appendFile(
+            'log.txt',
+            `----------\nVenue: ${item.venue.name} \nLocation: ${
+              item.venue.city
+            }, ${item.venue.region} \n${moment(item.datetime).format(
+              'MM/DD/YYYY'
+            )}\n`,
+            function(err) {
+              if (err) {
+                console.log(err);
+              }
+            }
+          );
+        }); //End of forEach
+        console.log(concertArr);
+        fs.appendFile('log.txt', `\n \n \n`, function(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      } else {
+        // No concerts scheduled
+        console.log('No concert dates right now');
+      }
+    })
+    .catch(function(err) {
+      console.log(err);
+      console.log('**No Artist Found**');
+    });
+};
