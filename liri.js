@@ -151,3 +151,121 @@ var spotifyThisSong = function(input) {
       console.log(err);
     });
 };
+
+//OMDB FUNCTION
+
+var movieThis = function(input) {
+  var queryURL =
+    'http://www.omdbapi.com/?t=' + input + '&y=&plot=short&apikey=trilogy';
+
+  axios
+    .get(queryURL)
+    .then(function(response) {
+      let IMDB = '';
+      let rotten = '';
+      // Sometimes the array of movie ratings returns empty. If
+      // it does their valuse are set to "N/A".
+      if (response.data && response.data.length) {
+        IMDB = response.data.Ratings[0].Value;
+        rotten = response.data.Ratings[1].Value;
+      } else {
+        IMDB = 'N/A';
+        rotten = 'N/A';
+      }
+      fs.appendFile(
+        'log.txt',
+        `OMDB SEARCH RESULTS FOR ${input.toUpperCase()}\n`,
+        function(err) {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+      if (response.data.Title === undefined) {
+        console.log("**No movie found: Here's the movie 'Mr. Nobody'**");
+        axios
+          .get(
+            'http://www.omdbapi.com/?t=mr nobody&y=&plot=short&apikey=trilogy'
+          )
+          .then(function(response) {
+            console.log(
+              'Title: ' +
+                response.data.Title +
+                '\nYear: ' +
+                response.data.Year +
+                '\nIMBD Rating: ' +
+                IMDB +
+                '\nRotten Tomatoes Rating: ' +
+                rotten +
+                '\nProduction Country: ' +
+                response.data.Country +
+                '\nLanguage: ' +
+                response.data.Language +
+                '\nPlot: ' +
+                response.data.Plot +
+                '\nActors: ' +
+                response.data.Actors
+            );
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+      } else {
+        console.log(
+          'Title: ' +
+            response.data.Title +
+            '\nYear: ' +
+            response.data.Year +
+            '\nIMBD Rating: ' +
+            // IMDB +
+            '\nRotten Tomatoes Rating: ' +
+            // rotten +
+            '\nProduction Country: ' +
+            response.data.Country +
+            '\nLanguage: ' +
+            response.data.Language +
+            '\nPlot: ' +
+            response.data.Plot +
+            '\nActors: ' +
+            response.data.Actors
+        );
+        fs.appendFile(
+          'log.txt',
+          `----------\nTitle: ${response.data.Title} \nYear: ${response.data.Year} \nIMDB Rating: ${IMDB} \nRotten Tomatoes Rating: ${rotten}} \nProduction Country: ${response.data.Country} \nLanguage: ${response.data.Language} \nPlot: ${response.data.Plot} \nActors: ${response.data.Actors}\n\n\n`,
+          function(err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+      }
+    })
+    .catch(function() {
+      console.log("**No movie found: Here's the movie 'Mr. Nobody'**");
+      axios
+        .get('http://www.omdbapi.com/?t=mr nobody&y=&plot=short&apikey=trilogy')
+        .then(function(response) {
+          console.log(
+            'Title: ' +
+              response.data.Title +
+              '\nYear: ' +
+              response.data.Year +
+              '\nIMBD Rating: ' +
+              IMDB +
+              '\nRotten Tomatoes Rating: ' +
+              rotten +
+              '\nProduction Country: ' +
+              response.data.Country +
+              '\nLanguage: ' +
+              response.data.Language +
+              '\nPlot: ' +
+              response.data.Plot +
+              '\nActors: ' +
+              response.data.Actors
+          );
+        })
+        .catch(function(err) {
+          console.log(err);
+        });
+    });
+};
