@@ -269,3 +269,64 @@ var movieThis = function(input) {
         });
     });
 };
+
+//
+//FUNCTION CALL CONDITIONAL
+//
+
+//BANDSINTOWN CALL
+if (process.argv[2] === 'concert-this') {
+  let artist = '';
+  for (let i = 3; i < process.argv.length; i++) {
+    artist += process.argv[i] + ' ';
+  }
+  artist = artist.trim();
+
+  concertThis(artist);
+} //SPOTIFY CALL
+else if (process.argv[2] === 'spotify-this-song') {
+  let song = '';
+
+  for (let i = 3; i < process.argv.length; i++) {
+    song += process.argv[i] + ' ';
+  }
+
+  song = song.trim();
+
+  spotifyThisSong(song);
+} //OMDB CALL
+else if (process.argv[2] === 'movie-this') {
+  let movie = '';
+
+  for (let i = 3; i < process.argv.length; i++) {
+    movie += process.argv[i] + ' ';
+  }
+
+  movie = movie.trim();
+
+  movieThis(movie);
+} //FS CALL
+else if (process.argv[2] === 'do-what-it-says') {
+  fs.readFile('random.txt', 'utf8', function(err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    // Then split it by commas (to make it more readable)
+    var dataArr = data.split(',');
+
+    if (dataArr[0] === 'concert-this') {
+      concertThis(eval(dataArr[1]));
+    } else if (dataArr[0] === 'spotify-this-song') {
+      spotifyThisSong(eval(dataArr[1]));
+    } else if (dataArr[0] === 'movie-this') {
+      movieThis(eval(dataArr[1]));
+    } else {
+      console.log('Invalid txt file parameters.');
+    }
+  });
+} //ERROR MSG
+else {
+  console.log(
+    "**IMPROPER CALL** \n------------\nUse the following format \n------------ \nnode liri.js concert-this <artist/band name here> - FOR CONCERT DATES \nnode liri.js spotify-this-song '<song name here>' - FOR SONG SEARCH \nnode liri.js movie-this '<movie name here>' - FOR MOVIE INFO \nnode liri.js do-what-it-says - FOR TEXT FILE INPUT"
+  );
+}
